@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'ckeditor',
     'corsheaders',
     'django_filters',
+    'products',
+    'zarinpal'
 ]
 
 MIDDLEWARE = [
