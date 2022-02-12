@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from products.models import Product
+from core.models import License
 
 
 def main_products(request):
@@ -38,4 +39,18 @@ def product_detail(request, product_id):
 
 
 def success_purchase(request):
+    # if request.method == 'Get':
+    #     if request.response == "200":
+    #         name = request.GET['name']
+    #         phone = request.GET['phone']
+    #         email = request.GET['email']
+    #         # price = product.price --> request.GET['price']
+    #         # userNumbers = product.deviceUsers
+    #         # time = product.time
+    #         license = License.objects.create(expired_on=55, email="", deviceNumber=1, licenseType="time limit",
+    #                                          serialNumber=466)
+    #     except Exception as e:
+    #         context['error'] = str(e)
+    #     else:
+    #         return HttpResponseRedirect(reverse('products:ticket_details', kwargs={'ticket_id': ticket.id}))
     return render(request, 'products/lastPage.html')

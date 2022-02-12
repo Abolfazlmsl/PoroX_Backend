@@ -14,7 +14,7 @@ description = "توضیحات مربوط به تراکنش را در این قس
 email = 'email@example.com'  # Optional
 mobile = '09123456789'  # Optional
 # Important: need to edit for realy server.
-CallbackURL = 'http://localhost:8000/verify/'
+CallbackURL = 'http://localhost:8000/products/success'
 
 
 def send_request(request):
