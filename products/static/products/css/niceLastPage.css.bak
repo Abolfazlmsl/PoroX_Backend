@@ -36344,7 +36344,7 @@ a.u-link.u-text-hover-grey-90:hover {
 
 .u-header .u-nav-1 {
   font-family: IRANSansWeb;
-  font-size: 2.25rem;
+  font-size: 2rem;
   letter-spacing: 0px;
 }
 
@@ -36358,6 +36358,8 @@ a.u-link.u-text-hover-grey-90:hover {
     margin-top: -67px;
   }
 }
+
+
 
 .u-footer .u-sheet-1 {
   min-height: 120px;
@@ -36415,7 +36417,6 @@ a.u-link.u-text-hover-grey-90:hover {
     min-height: 36px;
   }
 }
-
  /*begin-variables base-font-size*/ 
  html { font-size: 16px; }
  /*end-variables base-font-size*/

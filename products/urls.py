@@ -9,4 +9,5 @@ router = DefaultRouter()
 urlpatterns = [
     path('', views.main_products, name='main_products'),
     path('products/<int:product_id>/', views.product_detail, name='product_detail'),
+    path('products/success', views.success_purchase, name='success_purchase'),
 ]
