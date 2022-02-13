@@ -62,8 +62,18 @@
       </div></header> 
     <section class="u-align-center u-clearfix u-palette-1-dark-3 u-section-1" id="sec-36ee">
       <div class="u-clearfix u-sheet u-valign-middle-lg u-valign-middle-md u-valign-middle-xl u-valign-middle-xs u-sheet-1">
-        <div class="u-palette-4-base u-shape u-shape-circle u-shape-1"></div>
-        <h1 class="u-text u-text-1">با تشکر از خرید شما<br>پرداخت با موفقیت انجام شد.<br>شماره سفارش: 202020<br>لایسنس به ایمیل شما ارسال می شود
+        <div class="
+        {% if status %}
+        u-palette-4-base
+        {% else %}
+        u-palette-2-base
+         {% endif %}
+        u-shape u-shape-circle u-shape-1"></div>
+          {% if status %}
+        <h1 class="u-text u-text-1">با تشکر از خرید شما<br>پرداخت با موفقیت انجام شد.<br>شماره سفارش: {{ order_id }}<br>لایسنس به ایمیل شما ارسال می شود
+            {% else %}
+              <h1 class="u-text u-text-1">پرداخت با مشکل مواجه شد.<br>در صورت کسر مبلغ از حساب شما تا 72 ساعت آینده این مبلغ به حساب شما باز خواهد گشت
+          {% endif %}
         </h1>
         <a href="{% url "products:main_products" %}" class="u-border-none u-btn u-button-style u-color-scheme-summer-time u-color-style-multicolor-1 u-hover-palette-1-dark-1 u-palette-4-base u-text-active-palette-1-dark-3 u-btn-1">بازگشت به صفحه اصلی</a>
       </div>

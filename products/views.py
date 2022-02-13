@@ -63,7 +63,7 @@ def product_payment(request):
         record.save()
 
         idpay_payment = payment_init()
-        result = idpay_payment.payment(str(order_id), amount, 'products/success/', payer)
+        result = idpay_payment.payment(str(order_id), amount, 'products/success', payer)
         # result = idpay_payment.payment(str(order_id), amount, 'payment/return', payer)
 
         if 'id' in result:
@@ -108,6 +108,11 @@ def success_purchase(request):
         card = request.POST.get('card_no')
         date = request.POST.get('date')
 
+        context = {
+            'order_id': order_id,
+            'status': (status == "10")
+        }
+
         if Main.objects.filter(order_id=order_id, payment_id=pid, amount=amount, status=1).count() == 1:
 
             idpay_payment = payment_init()
@@ -128,7 +133,8 @@ def success_purchase(request):
                     payment.bank_track_id = result['payment']['track_id']
                     payment.save()
 
-                    return render(request, 'error.html', {'txt': result['message']})
+                    # return render(request, 'error.html', {'txt': result['message']})
+                    return render(request, 'products/lastPage.html', context=context)
 
                 else:
                     txt = result['message']
@@ -142,4 +148,4 @@ def success_purchase(request):
 
     else:
         txt = "Bad Request"
-    return render(request, 'products/lastPage.html')
+    return render(request, 'products/lastPage.html', context=context)
