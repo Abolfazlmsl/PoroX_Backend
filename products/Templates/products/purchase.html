@@ -97,8 +97,9 @@
                       <h4 class="u-align-right u-text u-text-default u-text-3">جزییات پرداخت</h4>
                       <p class="u-align-right u-text u-text-default u-text-4" spellcheck="true">لطفا اطلاعات زیر را به منظور فرایند پردازش سفارش شما و پیگیری و پشتیبانی وارد نمایید.</p>
                       <div class="u-form u-form-1">
-                        <form action="#" method="POST" class="u-clearfix u-form-spacing-30 u-form-vertical u-inner-form" style="padding: 0;" source="custom" name="form">
-                          <div class="u-form-group u-form-partition-factor-2 u-form-phone u-form-group-1">
+                        <form action="{% url "payment:payment_start" %}" method="POST" class="u-clearfix u-form-spacing-30 u-form-vertical u-inner-form" source="custom" name="form">
+                          {% csrf_token %}
+                            <div class="u-form-group u-form-partition-factor-2 u-form-phone u-form-group-1">
                             <label for="email-da30" class="u-form-control-hidden u-label">Email</label>
                             <input type="tel" placeholder="شماره موبایل" id="email-da30" name="phone" class="u-grey-80 u-input u-input-rectangle" required="required">
                           </div>
@@ -114,12 +115,15 @@
                             <input type="checkbox" id="agree-1d18" name="agree" class="u-agree-checkbox" required="">
                             <label for="agree-1d18" class="u-label">من شرایط و مقررات را خوانده ام و آن را می پذیرم&nbsp;</label>
                           </div>
-{#                          <div class="u-align-right u-form-group u-form-submit u-form-group-5">#}
-{#                              {% csrf_token %}#}
-{#                            <a href="{% url "products:main_products" %}" class="u-border-none u-btn u-btn-submit u-button-style u-palette-4-base u-btn-1">پرداخت</a>#}
-{#                            <input type="submit" class="u-form-control-hidden">#}
-                          <div class="u-align-right u-form-group u-form-group-5">
-                              <a href="{% url "products:success_purchase" %}" class="u-border-none u-btn u-btn-submit u-button-style u-palette-4-base u-btn-1">پرداخت</a>
+
+                            <input type="hidden" value={{ product.price }} id="text-3440" name="amount">
+
+                          <div class="u-align-right u-form-group u-form-submit u-form-group-5">
+
+                            <a href="{% url "products:product_payment" %}" class="u-border-none u-btn u-btn-submit u-button-style u-palette-4-base u-btn-1">پرداخت</a>
+                            <input type="submit" class="u-form-control-hidden">
+{#                          <div class="u-align-right u-form-group u-form-group-5">#}
+{#                              <a href="{% url "products:success_purchase" %}" class="u-border-none u-btn u-btn-submit u-button-style u-palette-4-base u-btn-1">پرداخت</a>#}
                           </div>
 {#                          <div class="u-form-send-message u-form-send-success"> Thank you! Your message has been sent. </div>#}
 {#                          <div class="u-form-send-error u-form-send-message"> Unable to send your message. Please fix errors then try again. </div>#}

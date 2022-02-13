@@ -1,20 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from payment.models import Main
 from django.views.decorators.csrf import csrf_exempt
 from decouple import config
 from idpay.api import IDPayAPI
-from products.models import Product
-from payment.models import Main
-from core.models import License
 
+import requests
+import json
 import uuid
-
-
-def main_products(request):
-    products = Product.objects.all().order_by('time').order_by('deviceUsers')
-    context = {
-        'products': products,
-    }
-    return render(request, 'products/index.html', context=context)
 
 
 def payment_init():
@@ -25,37 +17,21 @@ def payment_init():
     return IDPayAPI(api_key, base_url, sandbox)
 
 
-def product_detail(request, product_id):
-    product = Product.objects.get(pk=product_id)
-    context = {
-        'product': product
-    }
-    return render(request, 'products/purchase.html', context)
+def home(request):
+    payments = Main.objects.all()
+    return render(request, 'home.html', {'payments': payments})
 
 
-def product_payment(request):
+def payment_start(request):
     if request.method == 'POST':
-        # try:
-        #     name = request.POST['name']
-        #     phone = request.POST['phone']
-        #     email = request.POST['email']
-        #     amount = product.price
-        #     userNumbers = product.deviceUsers
-        #     time = product.time
-        #     print(name)
-        #     print(phone)
-        #     print(email)
-        #     print(amount)
-        #     print(userNumbers)
-        #     print(time)
-        #     return redirect(reverse('payment:payment_start'))
         order_id = uuid.uuid1()
-        amount = request.POST.get('amount')
+        # amount = request.POST.get('amount')
+        amount = 1000
 
         payer = {
             'name': request.POST.get('name'),
             'phone': request.POST.get('phone'),
-            'mail': request.POST.get('email')
+            'mail': request.POST.get('email'),
             # 'desc': request.POST.get('desc'),
         }
 
@@ -75,29 +51,14 @@ def product_payment(request):
 
         else:
             txt = result['message']
-        #     except Exception as e:
-        #         context['error'] = str(e)
-        #     else:
-        #         pass
-    return render(request, 'products/lastPage.html')
+    else:
+        txt = "Bad Request"
+
+    return render(request, 'error.html', {'txt': txt})
 
 
 @csrf_exempt
-def success_purchase(request):
-    # if request.method == 'Get':
-    #     if request.response == "200":
-    #         name = request.GET['name']
-    #         phone = request.GET['phone']
-    #         email = request.GET['email']
-    #         # price = product.price --> request.GET['price']
-    #         # userNumbers = product.deviceUsers
-    #         # time = product.time
-    #         license = License.objects.create(expired_on=55, email="", deviceNumber=1, licenseType="time limit",
-    #                                          serialNumber=466)
-    #     except Exception as e:
-    #         context['error'] = str(e)
-    #     else:
-    #         return HttpResponseRedirect(reverse('products:ticket_details', kwargs={'ticket_id': ticket.id}))
+def payment_return(request):
     if request.method == 'POST':
 
         pid = request.POST.get('id')
@@ -134,12 +95,43 @@ def success_purchase(request):
                     txt = result['message']
 
             else:
-                txt = "Error Code : " + str(status) + "   |   " + "Description : " + idpay_payment.get_status(
-                    status)
+                txt = "Error Code : " + str(status) + "   |   " + "Description : " + idpay_payment.get_status(status)
 
         else:
             txt = "Order Not Found"
 
     else:
         txt = "Bad Request"
-    return render(request, 'products/lastPage.html')
+
+    return render(request, 'error.html', {'txt': txt})
+
+
+def payment_check(request, pk):
+
+    payment = Main.objects.get(pk=pk)
+
+    idpay_payment = payment_init()
+    result = idpay_payment.inquiry(payment.payment_id, payment.order_id)
+
+    if 'status' in result:
+
+        payment.status = result['status']
+        payment.idpay_track_id = result['track_id']
+        payment.bank_track_id = result['payment']['track_id']
+        payment.card_number = result['payment']['card_no']
+        payment.date = str(result['date'])
+        payment.save()
+
+    return render(request, 'error.html', {'txt': result['message']})
+
+
+def requirement(request):
+    txt = "pip install idpay"
+
+    return render(request, 'error.html', {'txt': txt})
+
+
+def about_me(request):
+    txt = 'IDPay'
+
+    return render(request, 'error.html', {'txt': txt})
