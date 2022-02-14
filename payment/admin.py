@@ -1,4 +1,4 @@
 from django.contrib import admin
-from payment.models import Main
+from payment.models import Payment
 
-admin.site.register(Main)
+admin.site.register(Payment)

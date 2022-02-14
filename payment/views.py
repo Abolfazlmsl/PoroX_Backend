@@ -1,32 +1,35 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from payment.models import Main
+from payment.models import Payment
+from core.models import License
 from django.views.decorators.csrf import csrf_exempt
 from decouple import config
 from idpay.api import IDPayAPI
 
-import requests
-import json
-import uuid
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
+import ssl
 
+import uuid
+import datetime
+
+
+def getExpiredDate(time):
+    date = datetime.datetime.now() + datetime.timedelta(int(time))
+    return date.strftime('%Y-%m-%d')
 
 def payment_init():
     base_url = config('BASE_URL', default='http://127.0.0.1:8000/', cast=str)
-    api_key = config('IDPAY_API_KEY', default='97ded38e-9a89-488b-b4e9-6d1b5570f93e', cast=str)
+    api_key = config('IDPAY_API_KEY', default='3ef6e2b3-59a0-4964-af54-09866cbf25bb', cast=str)
     sandbox = config('IDPAY_SANDBOX', default=True, cast=bool)
 
     return IDPayAPI(api_key, base_url, sandbox)
 
 
-def home(request):
-    payments = Main.objects.all()
-    return render(request, 'home.html', {'payments': payments})
-
-
 def payment_start(request):
     if request.method == 'POST':
         order_id = uuid.uuid1()
-        # amount = request.POST.get('amount')
-        amount = 1000
+        amount = request.POST.get('amount')
 
         payer = {
             'name': request.POST.get('name'),
@@ -35,12 +38,20 @@ def payment_start(request):
             # 'desc': request.POST.get('desc'),
         }
 
-        record = Main(order_id=order_id, amount=int(amount))
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        deviceNumber = request.POST.get('deviceUsers')
+        time = request.POST.get('time')
+        time = getExpiredDate(time)
+
+        record = Payment(order_id=order_id, amount=int(amount), name=name, phone=phone,
+                         email=email, deviceNumber=deviceNumber, time=time)
         record.save()
 
         idpay_payment = payment_init()
-        result = idpay_payment.payment(str(order_id), amount, 'products/success/', payer)
-        # result = idpay_payment.payment(str(order_id), amount, 'payment/return', payer)
+        # result = idpay_payment.payment(str(order_id), amount, 'products/success/', payer)
+        result = idpay_payment.payment(str(order_id), amount, 'idpay/payment/return', payer)
 
         if 'id' in result:
             record.status = 1
@@ -54,7 +65,7 @@ def payment_start(request):
     else:
         txt = "Bad Request"
 
-    return render(request, 'error.html', {'txt': txt})
+    return render(request, 'products/lastPage.html')
 
 
 @csrf_exempt
@@ -69,11 +80,16 @@ def payment_return(request):
         card = request.POST.get('card_no')
         date = request.POST.get('date')
 
-        if Main.objects.filter(order_id=order_id, payment_id=pid, amount=amount, status=1).count() == 1:
+        context = {
+            'order_id': order_id,
+            'status': (status == "10")
+        }
+
+        if Payment.objects.filter(order_id=order_id, payment_id=pid, amount=amount, status=1).count() == 1:
 
             idpay_payment = payment_init()
 
-            payment = Main.objects.get(payment_id=pid, amount=amount)
+            payment = Payment.objects.get(payment_id=pid, amount=amount)
             payment.status = status
             payment.date = str(date)
             payment.card_number = card
@@ -89,7 +105,36 @@ def payment_return(request):
                     payment.bank_track_id = result['payment']['track_id']
                     payment.save()
 
-                    return render(request, 'error.html', {'txt': result['message']})
+                    # Generate license
+                    newLicense = License(expired_on=payment.time, deviceNumber=payment.deviceNumber,
+                                         licenseType="time limit", email=payment.email, serialNumber=payment.order_id)
+                    newLicense.save()
+
+                    # Send email to user
+                    serial = payment.order_id
+                    key = newLicense.key
+                    message = "Thank you for purchasing the PoroX software license"
+                    msg = MIMEMultipart()
+
+                    password = "3@#abmsl@"
+                    msg['From'] = "poroxsoftware@gmail.com"
+                    msg['To'] = payment.email
+                    msg['Subject'] = "PoroX license"
+
+                    message = message + "\nYour license key: " + key + "\nYour serial number: " + serial
+                    msg.attach(MIMEText(message, 'plain'))
+
+                    sslContext = ssl.create_default_context()
+                    server = smtplib.SMTP_SSL(host='smtp.gmail.com', port=465, context=sslContext)
+
+                    server.login(msg['From'], password)
+
+                    server.sendmail(msg['From'], msg['To'], msg.as_string())
+
+                    server.quit()
+
+                    # return render(request, 'error.html', {'txt': result['message']})
+                    return render(request, 'products/lastPage.html', context=context)
 
                 else:
                     txt = result['message']
@@ -103,12 +148,12 @@ def payment_return(request):
     else:
         txt = "Bad Request"
 
-    return render(request, 'error.html', {'txt': txt})
+    return render(request, 'products/lastPage.html', context=context)
 
 
 def payment_check(request, pk):
 
-    payment = Main.objects.get(pk=pk)
+    payment = Payment.objects.get(pk=pk)
 
     idpay_payment = payment_init()
     result = idpay_payment.inquiry(payment.payment_id, payment.order_id)

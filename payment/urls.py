@@ -7,7 +7,6 @@ app_name = 'payment'
 router = DefaultRouter()
 
 urlpatterns = [
-    path('', views.home, name='home'),
     path('payment', views.payment_start, name='payment_start'),
     path('payment/return', views.payment_return, name='payment_return'),
     path('payment/check/<pk>', views.payment_check, name='payment_check'),
