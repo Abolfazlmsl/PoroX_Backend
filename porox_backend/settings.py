@@ -123,11 +123,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+RENDERER = ('rest_framework.renderers.JSONRenderer', )
+if DEBUG:
+    RENDERER += ('rest_framework.renderers.BrowsableAPIRenderer', )
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_RENDERER_CLASSES': RENDERER
 }
 
 SIMPLE_JWT = {
