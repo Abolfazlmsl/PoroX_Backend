@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.utils.translation import gettext as _
 
 from core import models
+from .models import License
 
 
 class UserAdmin(UserAdminBase):
@@ -43,6 +44,13 @@ class UserAdmin(UserAdminBase):
     )
 
 
+class LicenseAdmin(admin.ModelAdmin):
+    # search_fields = ['email', 'licenseType', 'devices', ]
+    list_display = ('key', 'email', 'licenseType', )
+    list_filter = ('email', 'licenseType', )
+
+
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Device)
-admin.site.register(models.License)
+# admin.site.register(models.License)
+admin.site.register(License, LicenseAdmin)

@@ -10,5 +10,5 @@ class Product(models.Model):
     deviceUsers = models.IntegerField()
     time = models.IntegerField()
 
-    def __str__(self):
-        return "{} days, {} users, {} tomans".format(self.time, self.deviceUsers, self.price)
+    # def __str__(self):
+    #     return "{} days, {} users, {} tomans".format(self.time, self.deviceUsers, self.price)

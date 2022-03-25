@@ -12,13 +12,6 @@ class DeviceViewSet(viewsets.GenericViewSet,
                     mixins.RetrieveModelMixin,
                     mixins.CreateModelMixin,
                     mixins.DestroyModelMixin):
-    """ list and retrieve devices"""
-    filter_backends = [
-        # DjangoFilterBackend,
-        # filters.OrderingFilter,
-        filters.SearchFilter
-    ]
-    search_fields = ('title',)
     serializer_class = serializers.DeviceSerializer
     authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAuthenticated,)
@@ -33,13 +26,6 @@ class LicenseViewSet(viewsets.GenericViewSet,
                      mixins.RetrieveModelMixin,
                      mixins.CreateModelMixin,
                      mixins.UpdateModelMixin):
-    """ list and retrieve licenses"""
-    filter_backends = [
-        # DjangoFilterBackend,
-        # filters.OrderingFilter,
-        filters.SearchFilter
-    ]
-    search_fields = ('title',)
     serializer_class = serializers.LicenseSerializer
     authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAuthenticated,)
