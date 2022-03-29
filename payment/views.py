@@ -19,9 +19,9 @@ def getExpiredDate(time):
     return date.strftime('%Y-%m-%d')
 
 def payment_init():
-    base_url = config('BASE_URL', default='http://127.0.0.1:8000/', cast=str)
+    base_url = config('BASE_URL', default='http://digitalrockphysics.ir/', cast=str)
     api_key = config('IDPAY_API_KEY', default='73292c3b-231c-471e-a8cd-cd5d7d13effe', cast=str)
-    sandbox = config('IDPAY_SANDBOX', default=True, cast=bool)
+    sandbox = config('IDPAY_SANDBOX', default=False, cast=bool)
 
     return IDPayAPI(api_key, base_url, sandbox)
 
@@ -30,6 +30,7 @@ def payment_start(request):
     if request.method == 'POST':
         order_id = uuid.uuid1()
         amount = request.POST.get('amount')
+        amount = str(int(amount)*10)
 
         payer = {
             'name': request.POST.get('name'),
@@ -118,14 +119,14 @@ def payment_return(request):
 
                     password = "Porox@Sharif1" #"3@#abmsl@"
                     msg['From'] = "reza.shams@digitalrockphysics.ir" #"poroxsoftware@gmail.com"
-                    msg['To'] = email
+                    msg['To'] = payment.email
                     msg['Subject'] = "PoroX license"
 
                     message = message + "\nYour license key: " + key + "\nYour serial number: " + serial
                     msg.attach( MIMEText(message, 'plain') )
 
-                    context = ssl.create_default_context()
-                    server = smtplib.SMTP_SSL(host='mail.digitalrockphysics.ir', port=465, context=context)
+                    contextEmail = ssl.create_default_context()
+                    server = smtplib.SMTP_SSL(host='mail.digitalrockphysics.ir', port=465, context=contextEmail)
 
                     server.login(msg['From'], password)
 

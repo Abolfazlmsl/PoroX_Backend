@@ -45,8 +45,8 @@ class UserAdmin(UserAdminBase):
 
 
 class LicenseAdmin(admin.ModelAdmin):
-    # search_fields = ['email', 'licenseType', 'devices', ]
-    list_display = ('key', 'email', 'licenseType', )
+    search_fields = ['email', 'serialNumber', ]
+    list_display = ('key', 'email', 'licenseType', 'serialNumber')
     list_filter = ('email', 'licenseType', )
 
 
