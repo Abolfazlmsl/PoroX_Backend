@@ -129,10 +129,12 @@ class License(models.Model):
     deviceNumber = models.IntegerField(default=1)
     devices = models.ManyToManyField(Device, related_name='devices', blank=True)
     licenseType = models.CharField(max_length=255, choices=CHOICES)
-    email = models.EmailField(
-        max_length=255,
-        null=True
-    )
+    name = models.CharField(max_length=255, default=0000, null=True)
+    phone = models.CharField(max_length=255, default=0000, null=True)
+    email = models.EmailField(max_length=255, null=True)
+    education = models.CharField(max_length=255, default=0000, blank=True)
+    job = models.CharField(max_length=255, default=0000, blank=True)
+    active = models.BooleanField(default=False)
     serialNumber = models.CharField(max_length=255, default=create_new_ref_number, unique=True, editable=False)
 
     def __str__(self):

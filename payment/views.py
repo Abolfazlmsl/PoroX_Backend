@@ -108,7 +108,8 @@ def payment_return(request):
 
                     # Generate license
                     newLicense = License(expired_on=payment.time, deviceNumber=payment.deviceNumber,
-                                         licenseType="time limit", email=payment.email, serialNumber=payment.order_id)
+                                         licenseType="time limit", email=payment.email, name=payment.name,
+                                         phone=payment.phone, active=True, serialNumber=payment.order_id)
                     newLicense.save()
 
                     # Send email to user
