@@ -18,6 +18,26 @@ def getExpiredDate(time):
     date = datetime.datetime.now() + datetime.timedelta(int(time))
     return date.strftime('%Y-%m-%d')
 
+
+def send_email(email, subject, message):
+    msg = MIMEMultipart()
+
+    password = "Porox@Sharif1"  # "3@#abmsl@"
+    msg['From'] = "reza.shams@digitalrockphysics.ir"  # "poroxsoftware@gmail.com"
+    msg['To'] = email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(message, 'plain'))
+
+    contextEmail = ssl.create_default_context()
+    server = smtplib.SMTP_SSL(host='mail.digitalrockphysics.ir', port=465, context=contextEmail)
+
+    server.login(msg['From'], password)
+
+    server.sendmail(msg['From'], msg['To'], msg.as_string())
+
+    server.quit()
+
+
 def payment_init():
     base_url = config('BASE_URL', default='http://digitalrockphysics.ir/', cast=str)
     api_key = config('IDPAY_API_KEY', default='73292c3b-231c-471e-a8cd-cd5d7d13effe', cast=str)
@@ -116,24 +136,10 @@ def payment_return(request):
                     serial = payment.order_id
                     key = newLicense.key
                     message = "Thank you for purchasing the PoroX software license"
-                    msg = MIMEMultipart()
-
-                    password = "Porox@Sharif1" #"3@#abmsl@"
-                    msg['From'] = "reza.shams@digitalrockphysics.ir" #"poroxsoftware@gmail.com"
-                    msg['To'] = payment.email
-                    msg['Subject'] = "PoroX license"
-
                     message = message + "\nYour license key: " + key + "\nYour serial number: " + serial
-                    msg.attach( MIMEText(message, 'plain') )
-
-                    contextEmail = ssl.create_default_context()
-                    server = smtplib.SMTP_SSL(host='mail.digitalrockphysics.ir', port=465, context=contextEmail)
-
-                    server.login(msg['From'], password)
-
-                    server.sendmail(msg['From'], msg['To'], msg.as_string())
-
-                    server.quit()
+                    subject = "PoroX license"
+                    email = payment.email
+                    send_email(email, subject, message)
 
                     # return render(request, 'error.html', {'txt': result['message']})
                     return render(request, 'products/lastPage.html', context=context)

@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 
 from core import models
 from .models import License
+from payment.views import getExpiredDate, send_email
 
 
 class UserAdmin(UserAdminBase):
@@ -48,6 +49,23 @@ class LicenseAdmin(admin.ModelAdmin):
     search_fields = ['email', 'serialNumber', ]
     list_display = ('key', 'email', 'licenseType', 'serialNumber')
     list_filter = ('email', 'licenseType', )
+
+    def save_model(self, request, obj, form, change):
+        field = 'active'
+        super().save_model(request, obj, form, change)
+        if change and field in form.changed_data:
+            if form.cleaned_data.get(field):
+                obj.expired_on = getExpiredDate(15)
+                super().save_model(request, obj, form, change)
+                email = form.cleaned_data.get('email')
+                subject = 'PoroX license'
+                message = "Admin has activated your license.\nYou can now activate PoroX software with your license."
+                send_email(email, subject, message)
+            else:
+                email = form.cleaned_data.get('email')
+                subject = 'PoroX license'
+                message = "Admin has deactivated your license."
+                send_email(email, subject, message)
 
 
 admin.site.register(models.User, UserAdmin)
