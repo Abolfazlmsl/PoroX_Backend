@@ -39,8 +39,8 @@ def send_email(email, subject, message):
 
 
 def payment_init():
-    base_url = config('BASE_URL', default='http://digitalrockphysics.ir/', cast=str)
-    api_key = config('IDPAY_API_KEY', default='73292c3b-231c-471e-a8cd-cd5d7d13effe', cast=str)
+    base_url = config('BASE_URL', default='https://digitalrockphysics.ir/', cast=str)
+    api_key = config('IDPAY_API_KEY', default='277981f3-b434-4799-ae56-c616e3502f9e', cast=str)
     sandbox = config('IDPAY_SANDBOX', default=False, cast=bool)
 
     return IDPayAPI(api_key, base_url, sandbox)
